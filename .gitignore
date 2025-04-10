@@ -1,4 +1,9 @@
 # Linkedin file names not pushed to git
 *-Linkedin.md 
+*.tfvars
+*.tfstate
+*.tfstate.backup
 
 # 
+.DS_Store
+.DS_Store
