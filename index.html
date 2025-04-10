@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Architecture - Test and Prod Environments (AWS)</title>
+  <style>
+    /* Enhanced CSS */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 40px;
+      background-color: #f8f9fa; /* Light gray background */
+      color: #343a40; /* Dark gray text */
+    }
+
+    h1, h2 {
+      color: #007bff; /* Primary blue */
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      border-bottom: 3px solid #007bff;
+      padding-bottom: 15px;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-top: 40px;
+    }
+
+    p {
+      margin-bottom: 1.5em;
+      color: #555; /* Slightly lighter text for body */
+    }
+
+    ol, ul {
+      margin-bottom: 1.5em;
+      padding-left: 30px;
+      list-style-type: disc; /* Use bullets for unordered lists */
+    }
+
+    ol {
+      list-style-type: decimal; /* Use numbers for ordered lists */
+    }
+
+    li {
+      margin-bottom: 0.7em;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background-color: #e9ecef; /* Light gray background for diagrams */
+      padding: 20px;
+      border: 1px solid #ced4da; /* Light gray border */
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    pre b {
+      font-weight: bold;
+      color: #17a2b8; /* Info color for emphasis */
+    }
+
+    .section {
+      margin-bottom: 50px;
+      padding: 20px;
+      background-color: #fff; /* White background for sections */
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .overview {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .flow {
+      margin-top: 30px;
+    }
+
+    .environment-breakdown {
+      display: flex;
+      gap: 30px;
+    }
+
+    .environment {
+      flex: 1;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+
+    .shared-components pre {
+      background-color: #f0f8ff; /* Light blue for shared components */
+      border-color: #add8e6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Website Architecture - Test and Prod Environments (AWS)</h1>
+    <p class="overview">A visual representation of the infrastructure for both live and testing versions of the website.</p>
+  </header>
+
+  <main>
+    <section class="section flow">
+      <h2>User Access Flow</h2>
+      <ol>
+        <li><strong>User Request:</strong> A user's browser sends a request to the website's domain.</li>
+        <li><strong>DNS Resolution (Route 53):</strong> AWS Route 53 resolves the domain name to the IP address of the appropriate ALB.</li>
+        <li><strong>Load Balancing (ALB):</strong> The ALB forwards the request to a healthy EC2 instance in its ASG.</li>
+        <li><strong>Application Processing (EC2 Instances):</strong> The Laravel application on the EC2 instance processes the request, interacting with other services as needed.</li>
+        <li><strong>Response to User:</strong> The processed response is sent back through the ALB to the user's browser.</li>
+      </ol>
+    </section>
+
+    <section class="section environment-breakdown">
+      <div class="environment">
+        <h2>Production Environment</h2>
+        <pre>
+                                 +---------------+
+                                 |    Client     |
+                                 +---------------+
+                                       |
+                                       v
+                                 +---------------+
+                                 |   Route 53    |
+                                 +---------------+
+                                       |
+                                       v
+                                 +-----------------------+
+                                 |   ALB (Production)    |
+                                 +-----------------------+
+                                       |
+                                       v
+                                 +-----------------------+
+                                 |   ASG (Production)    |
+                                 +-----------------------+
+                                       |
+                                       v
+                         +-------------------------------+
+                         |   EC2 Instances (Production)  |
+                         | (Nginx, PHP-FPM, Laravel App)|
+                         +-------------------------------+
+                               /       |       \
+                              /        |        \
+                             v        v         v
+                    +----------------+  +--------------------+  +--------------------+
+                    | RDS MySQL (Prod)|  | ElastiCache (Prod) |  |   S3 Bucket (Prod) |
+                    +----------------+  +--------------------+  +--------------------+
+                             ^                 ^
+                             |                 |
+                             +-----------------+
+                                     |
+                                     v
+                           +--------------------+
+                           | CloudWatch Logs (Prod)|
+                           +--------------------+
+        </pre>
+        <p><strong>Description:</strong> This is the live environment accessed by users.</p>
+        <ul>
+          <li><strong>Route 53:</strong> DNS for the production domain.</li>
+          <li><strong>ALB (Production):</strong> Load balancer for production traffic.</li>
+          <li><strong>ASG (Production):</strong> Manages production EC2 instances.</li>
+          <li><strong>EC2 Instances (Production):</strong> Servers running the live website.</li>
+          <li><strong>RDS MySQL (Prod):</strong> Database for live website data.</li>
+          <li><strong>ElastiCache (Prod):</strong> Caching for live website.</li>
+          <li><strong>S3 Bucket (Prod):</strong> Storage for live website files.</li>
+          <li><strong>CloudWatch Logs (Prod):</strong> Logging for the live environment.</li>
+        </ul>
+      </div>
+
+      <div class="environment">
+        <h2>Staging Environment</h2>
+        <pre>
+                                 +---------------+
+                                 |    Client     |
+                                 +---------------+
+                                       |
+                                       v
+                                 +---------------+
+                                 |   Route 53    |
+                                 +---------------+
+                                       |
+                                       v
+                                 +-----------------------+
+                                 |    ALB (Staging)     |
+                                 +-----------------------+
+                                       |
+                                       v
+                                 +-----------------------+
+                                 |    ASG (Staging)     |
+                                 +-----------------------+
+                                       |
+                                       v
+                         +-------------------------------+
+                         |   EC2 Instances (Staging)   |
+                         | (Nginx, PHP-FPM, Laravel App)|
+                         +-------------------------------+
+                               /       |       \
+                              /        |        \
+                             v        v         v
+                    +-----------------+  +---------------------+  +---------------------+
+                    | RDS MySQL (Stag)|  | ElastiCache (Stag)  |  |   S3 Bucket (Stag)  |
+                    +-----------------+  +---------------------+  +---------------------+
+                             ^                 ^
+                             |                 |
+                             +-----------------+
+                                     |
+                                     v
+                           +---------------------+
+                           | CloudWatch Logs (Stag)|
+                           +---------------------+
+        </pre>
+        <p><strong>Description:</strong> This is the testing environment for new features and updates.</p>
+        <ul>
+          <li><strong>Route 53:</strong> DNS for the staging domain.</li>
+          <li><strong>ALB (Staging):</strong> Load balancer for staging traffic.</li>
+          <li><strong>ASG (Staging):</strong> Manages staging EC2 instances.</li>
+          <li><strong>EC2 Instances (Staging):</strong> Servers running the testing website.</li>
+          <li><strong>RDS MySQL (Stag):</strong> Database for the testing website.</li>
+          <li><strong>ElastiCache (Stag):</strong> Caching for the testing website.</li>
+          <li><strong>S3 Bucket (Stag):</strong> Storage for testing website files.</li>
+          <li><strong>CloudWatch Logs (Stag):</strong> Logging for the testing environment.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section shared-components">
+      <h2>Shared Components / External Services with Linkages</h2>
+      <pre>
++-------------------------+     +-------------------------+
+| Laravel App (Production)| --> |     Google Analytics    |
++-------------------------+     +-------------------------+
+          |
+          v
++-------------------------+
+| Laravel App (Staging)   | --> |   Google Search Console |
++-------------------------+     +-------------------------+
+          |
+          v
++-------------------------+     +-------------------------+
+| Laravel App (Production)| --> |     Google Tag Manager  |
++-------------------------+     +-------------------------+
+          |
+          v
++-------------------------+
+| Laravel App (Staging)   | --> |     GitHub / Bitbucket  |
++-------------------------+     +-------------------------+
+      </pre>
+      <p><strong>Description:</strong> These services are utilized by both environments.</p>
+      <ul>
+        <li><strong>Google Analytics:</strong> Tracks website traffic and user behavior.</li>
+        <li><strong>Google Search Console:</strong> Monitors website performance in Google search results.</li>
+        <li><strong>Google Tag Manager:</strong> Manages website tracking codes.</li>
+        <li><strong>GitHub / Bitbucket:</strong> Stores and manages the website's codebase.</li>
+      </ul>
+    </section>
+  </main>
+
+</body>
+</html>

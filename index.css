@@ -1,0 +1,53 @@
+body {
+    font-family: monospace;
+    line-height: 1.5;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  h1, h2 {
+    color: #007bff; /* A nice blue */
+    margin-bottom: 15px;
+  }
+  
+  h1 {
+    font-size: 2em;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+    margin-top: 0;
+  }
+  
+  h2 {
+    font-size: 1.5em;
+    margin-top: 30px;
+  }
+  
+  p {
+    margin-bottom: 1em;
+  }
+  
+  ol, ul {
+    margin-bottom: 1em;
+    padding-left: 20px;
+  }
+  
+  li {
+    margin-bottom: 0.5em;
+  }
+  
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #eee;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow-x: auto; /* Handle potentially wide diagrams */
+    font-size: 0.9em; /* Slightly smaller for better fit */
+  }
+  
+  pre b { /* Optional: To highlight keywords in the diagram if you add them */
+    font-weight: bold;
+    color: #0056b3;
+  }
